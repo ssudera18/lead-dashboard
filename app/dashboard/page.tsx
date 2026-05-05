@@ -57,368 +57,203 @@ function decisionFromAcceptance(status: string): ActionDecision {
 function decisionBadgeVariant(decision: ActionDecision) {
   switch (decision) {
     case "SCALE":
-      return "bg-emerald-600 hover:bg-emerald-600";
+      return "bg-emerald-500 text-white shadow-md";
     case "CUT":
-      return "bg-red-600 hover:bg-red-600";
+      return "bg-red-500 text-white shadow-md";
     default:
-      return "bg-amber-500 hover:bg-amber-500";
+      return "bg-yellow-400 text-black shadow-md";
   }
 }
 
 function statusBadgeVariant(status: string) {
   const s = (status || "").toLowerCase();
-  if (s === "accepted") return "bg-emerald-600 hover:bg-emerald-600";
-  if (s === "rejected") return "bg-red-600 hover:bg-red-600";
-  return "bg-slate-500 hover:bg-slate-500";
+  if (s === "accepted") return "bg-green-100 text-green-700";
+  if (s === "rejected") return "bg-red-100 text-red-700";
+  return "bg-gray-100 text-gray-700";
 }
 
 export default function Dashboard() {
   const [leads, setLeads] = React.useState<Lead[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<string | null>(null);
-
-  const [query, setQuery] = React.useState<string>("");
+  const [loading, setLoading] = React.useState(true);
+  const [query, setQuery] = React.useState("");
   const [decisionByLeadId, setDecisionByLeadId] = React.useState<
       Record<string, ActionDecision>
   >({});
-
   const [detailsLead, setDetailsLead] = React.useState<Lead | null>(null);
 
   React.useEffect(() => {
-    let alive = true;
-
     async function load() {
-      try {
-        setLoading(true);
-        setError(null);
+      const res = await fetch(
+          "https://lead-backend-l34r.onrender.com/api/dashboard"
+      );
+      const data = await res.json();
+      setLeads(data);
 
-        const res = await fetch(
-            "https://lead-backend-l34r.onrender.com/api/dashboard",
-            { cache: "no-store" }
+      const initial: any = {};
+      data.forEach((l: Lead) => {
+        initial[l.lead_id] = decisionFromAcceptance(
+            l.carrier_acceptance_status
         );
+      });
 
-        if (!res.ok) {
-          throw new Error("Failed to load dashboard data");
-        }
-
-        const data = await res.json();
-
-        const rows: Lead[] = Array.isArray(data) ? data : data?.data ?? [];
-        if (!alive) return;
-
-        setLeads(rows);
-
-        // Initialize decisions (default derived from acceptance)
-        const initial: Record<string, ActionDecision> = {};
-        for (const l of rows) {
-          initial[l.lead_id] = decisionFromAcceptance(l.carrier_acceptance_status);
-        }
-        setDecisionByLeadId(initial);
-      } catch (e: any) {
-        if (!alive) return;
-        setError(e?.message ?? "Something went wrong");
-      } finally {
-        if (alive) setLoading(false);
-      }
+      setDecisionByLeadId(initial);
+      setLoading(false);
     }
 
     load();
-    return () => {
-      alive = false;
-    };
   }, []);
 
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return leads;
+  const filtered = leads.filter((l) =>
+      JSON.stringify(l).toLowerCase().includes(query.toLowerCase())
+  );
 
-    return leads.filter((l) => {
-      return (
-          l.lead_id?.toLowerCase().includes(q) ||
-          l.lead_name?.toLowerCase().includes(q) ||
-          l.source?.toLowerCase().includes(q) ||
-          l.state?.toLowerCase().includes(q) ||
-          l.pincode?.toLowerCase().includes(q) ||
-          l.carrier_acceptance_status?.toLowerCase().includes(q)
-      );
-    });
-  }, [leads, query]);
+  const totals = {
+    total: leads.length,
+    accepted: leads.filter(
+        (l) => l.carrier_acceptance_status === "Accepted"
+    ).length,
+    rejected: leads.filter(
+        (l) => l.carrier_acceptance_status === "Rejected"
+    ).length,
+  };
 
-  const totals = React.useMemo(() => {
-    const total = leads.length;
-    const accepted = leads.filter(
-        (l) => (l.carrier_acceptance_status || "").toLowerCase() === "accepted"
-    ).length;
-    const rejected = leads.filter(
-        (l) => (l.carrier_acceptance_status || "").toLowerCase() === "rejected"
-    ).length;
+  const acceptanceRate =
+      totals.total > 0 ? Math.round((totals.accepted / totals.total) * 100) : 0;
 
-    const acceptanceRate =
-        total > 0 ? Math.round((accepted / total) * 100) : 0;
-
-    return { total, accepted, rejected, acceptanceRate };
-  }, [leads]);
-
-  function setDecision(leadId: string, decision: ActionDecision) {
-    setDecisionByLeadId((prev) => ({ ...prev, [leadId]: decision }));
+  function setDecision(id: string, decision: ActionDecision) {
+    setDecisionByLeadId((prev) => ({ ...prev, [id]: decision }));
   }
 
   return (
-      <div className="p-6 grid gap-6">
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Leads</CardTitle>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">
-              {loading ? "…" : totals.total.toLocaleString()}
-            </CardContent>
-          </Card>
+      <div className="p-6 space-y-6 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 min-h-screen">
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Acceptance Rate</CardTitle>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">
-              {loading ? "…" : `${totals.acceptanceRate}%`}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Accepted</CardTitle>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">
-              {loading ? "…" : totals.accepted.toLocaleString()}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Rejected</CardTitle>
-            </CardHeader>
-            <CardContent className="text-2xl font-semibold">
-              {loading ? "…" : totals.rejected.toLocaleString()}
-            </CardContent>
-          </Card>
+        {/* KPI */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[
+            { label: "Total Leads", value: totals.total, color: "text-indigo-600" },
+            { label: "Acceptance Rate", value: `${acceptanceRate}%`, color: "text-green-600" },
+            { label: "Accepted", value: totals.accepted, color: "text-emerald-600" },
+            { label: "Rejected", value: totals.rejected, color: "text-red-600" },
+          ].map((kpi, i) => (
+              <Card key={i} className="rounded-2xl shadow-lg border-0 bg-white/70 backdrop-blur hover:shadow-xl transition">
+                <CardHeader>
+                  <CardTitle className="text-sm text-gray-500">{kpi.label}</CardTitle>
+                </CardHeader>
+                <CardContent className={`text-3xl font-bold ${kpi.color}`}>
+                  {loading ? "…" : kpi.value}
+                </CardContent>
+              </Card>
+          ))}
         </div>
 
-        {/* Leads Table */}
-        <Card className="overflow-hidden">
-          <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="grid gap-1">
+        {/* TABLE */}
+        <Card className="rounded-2xl shadow-xl border-0 bg-white">
+          <CardHeader className="flex flex-col sm:flex-row justify-between gap-3">
+            <div>
               <CardTitle>Leads</CardTitle>
-              <div className="text-sm text-muted-foreground">
-                Attractive table with per-row action dropdown (SCALE / LIVE / CUT)
-              </div>
+              <p className="text-sm text-gray-500">
+                Manage and analyze lead performance
+              </p>
             </div>
 
-            <div className="flex w-full items-center gap-2 sm:w-auto">
-              <Input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search by name, source, state, status…"
-                  className="w-full sm:w-[320px]"
-              />
-            </div>
+            <Input
+                placeholder="🔍 Search leads..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full sm:w-[320px] rounded-xl border-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500"
+            />
           </CardHeader>
 
           <CardContent className="p-0">
-            {error ? (
-                <div className="p-6 text-sm text-red-600">{error}</div>
-            ) : (
-                <div className="max-h-[560px] overflow-auto">
-                  <Table>
-                    <TableHeader className="sticky top-0 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-                      <TableRow>
-                        <TableHead className="w-[120px]">Lead ID</TableHead>
-                        <TableHead className="min-w-[180px]">Name</TableHead>
-                        <TableHead className="min-w-[200px]">Source</TableHead>
-                        <TableHead className="min-w-[140px]">Timestamp</TableHead>
-                        <TableHead className="min-w-[140px]">
-                          Form Time (s)
-                        </TableHead>
-                        <TableHead className="min-w-[120px]">State</TableHead>
-                        <TableHead className="min-w-[110px]">Pincode</TableHead>
-                        <TableHead className="min-w-[130px]">Status</TableHead>
-                        <TableHead className="min-w-[120px]">Decision</TableHead>
-                        <TableHead className="w-[110px] text-right">
-                          Action
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
+            <div className="max-h-[560px] overflow-auto">
+              <Table>
+                <TableHeader className="sticky top-0 bg-gradient-to-r from-indigo-50 to-blue-50">
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Source</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Decision</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
 
-                    <TableBody>
-                      {loading ? (
-                          Array.from({ length: 8 }).map((_, i) => (
-                              <TableRow key={i} className="animate-pulse">
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground">…</TableCell>
-                                <TableCell className="text-muted-foreground text-right">
-                                  …
-                                </TableCell>
-                              </TableRow>
-                          ))
-                      ) : filtered.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={10} className="h-24 text-center">
-                              No leads found.
-                            </TableCell>
-                          </TableRow>
-                      ) : (
-                          filtered.map((l) => {
-                            const decision =
-                                decisionByLeadId[l.lead_id] ??
-                                decisionFromAcceptance(l.carrier_acceptance_status);
+                <TableBody>
+                  {filtered.map((l) => {
+                    const decision =
+                        decisionByLeadId[l.lead_id] ??
+                        decisionFromAcceptance(l.carrier_acceptance_status);
 
-                            return (
-                                <TableRow key={l.lead_id} className="hover:bg-muted/50">
-                                  <TableCell className="font-medium">
-                                    {l.lead_id}
-                                  </TableCell>
-                                  <TableCell>{l.lead_name}</TableCell>
-                                  <TableCell className="font-mono text-xs text-muted-foreground">
-                                    {l.source}
-                                  </TableCell>
-                                  <TableCell className="text-sm text-muted-foreground">
-                                    {l.timestamp}
-                                  </TableCell>
-                                  <TableCell className="text-sm">
-                                    {l.form_completion_time_sec}
-                                  </TableCell>
-                                  <TableCell>{l.state}</TableCell>
-                                  <TableCell className="font-mono text-sm">
-                                    {l.pincode}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge className={statusBadgeVariant(l.carrier_acceptance_status)}>
-                                      {l.carrier_acceptance_status}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge className={decisionBadgeVariant(decision)}>
-                                      {decision}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm">
-                                          Actions
-                                          <ChevronDown className="ml-2 h-4 w-4" />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end" className="w-44">
-                                        <DropdownMenuItem
-                                            onClick={() => setDecision(l.lead_id, "SCALE")}
-                                        >
-                                          Mark as SCALE
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => setDecision(l.lead_id, "LIVE")}
-                                        >
-                                          Mark as LIVE
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => setDecision(l.lead_id, "CUT")}
-                                        >
-                                          Mark as CUT
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setDetailsLead(l)}>
-                                          View details
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  </TableCell>
-                                </TableRow>
-                            );
-                          })
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-            )}
+                    return (
+                        <TableRow key={l.lead_id} className="hover:bg-indigo-50 transition">
+                          <TableCell>{l.lead_id}</TableCell>
+                          <TableCell>{l.lead_name}</TableCell>
+                          <TableCell className="text-xs text-gray-500">
+                            {l.source}
+                          </TableCell>
+
+                          <TableCell>
+                            <Badge className={statusBadgeVariant(l.carrier_acceptance_status)}>
+                              {l.carrier_acceptance_status}
+                            </Badge>
+                          </TableCell>
+
+                          <TableCell>
+                            <Badge className={decisionBadgeVariant(decision)}>
+                              {decision}
+                            </Badge>
+                          </TableCell>
+
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="sm" className="rounded-lg">
+                                  Actions <ChevronDown className="ml-2 w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setDecision(l.lead_id, "SCALE")}>
+                                  SCALE
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setDecision(l.lead_id, "LIVE")}>
+                                  LIVE
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setDecision(l.lead_id, "CUT")}>
+                                  CUT
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setDetailsLead(l)}>
+                                  View
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Details Dialog */}
-        <Dialog open={!!detailsLead} onOpenChange={(open) => !open && setDetailsLead(null)}>
-          <DialogContent className="sm:max-w-[640px]">
+        {/* DIALOG */}
+        <Dialog open={!!detailsLead} onOpenChange={() => setDetailsLead(null)}>
+          <DialogContent className="rounded-2xl">
             <DialogHeader>
-              <DialogTitle>Lead details</DialogTitle>
+              <DialogTitle>Lead Details</DialogTitle>
             </DialogHeader>
 
-            {detailsLead ? (
+            {detailsLead && (
                 <div className="grid gap-3 text-sm">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground">Lead ID</div>
-                      <div className="font-medium">{detailsLead.lead_id}</div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground">Name</div>
-                      <div className="font-medium">{detailsLead.lead_name}</div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground">Source</div>
-                      <div className="font-medium font-mono text-xs">
-                        {detailsLead.source}
-                      </div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground">Timestamp</div>
-                      <div className="font-medium">{detailsLead.timestamp}</div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground">
-                        Form completion time (s)
-                      </div>
-                      <div className="font-medium">
-                        {detailsLead.form_completion_time_sec}
-                      </div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground">State</div>
-                      <div className="font-medium">{detailsLead.state}</div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground">Pincode</div>
-                      <div className="font-medium font-mono">{detailsLead.pincode}</div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground">Status</div>
-                      <div className="font-medium">
-                        <Badge className={statusBadgeVariant(detailsLead.carrier_acceptance_status)}>
-                          {detailsLead.carrier_acceptance_status}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-md border p-3">
-                    <div className="text-xs text-muted-foreground">Phone</div>
-                    <div className="font-medium font-mono">
-                      {"[PHONE_NUMBER_HIDDEN]"}
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      Tip: avoid rendering full phone numbers in UI; mask or restrict access.
-                    </div>
-                  </div>
+                  <div><b>Name:</b> {detailsLead.lead_name}</div>
+                  <div><b>State:</b> {detailsLead.state}</div>
+                  <div><b>Pincode:</b> {detailsLead.pincode}</div>
+                  <div><b>Status:</b> {detailsLead.carrier_acceptance_status}</div>
                 </div>
-            ) : null}
+            )}
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDetailsLead(null)}>
-                Close
-              </Button>
+              <Button onClick={() => setDetailsLead(null)}>Close</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
