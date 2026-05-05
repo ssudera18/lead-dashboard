@@ -190,7 +190,7 @@ export default function Dashboard() {
                         <TableRow key={l.lead_id} className="hover:bg-indigo-50 transition">
                           <TableCell>{l.lead_id}</TableCell>
                           <TableCell>{l.lead_name} , {l.phone_number}</TableCell>
-                          <TableCell>{l.form_completion_time_sec && (l.form_completion_time_sec + 'Seconds.')} </TableCell>
+                          <TableCell>{l.form_completion_time_sec && (l.form_completion_time_sec + ' Seconds.')} </TableCell>
                           <TableCell>{l.state} | {l.pincode} </TableCell>
                           <TableCell className="text-xs text-gray-500">
                             {l.source}
