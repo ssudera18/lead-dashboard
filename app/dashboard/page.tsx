@@ -170,8 +170,8 @@ export default function Dashboard() {
                 <TableHeader className="sticky top-0 bg-gradient-to-r from-indigo-50 to-blue-50">
                   <TableRow>
                     <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Phone</TableHead>
+                    <TableHead>Name & Phone</TableHead>
+                    <TableHead>Form Filled Duration</TableHead>
                     <TableHead>State | Postal Code</TableHead>
                     <TableHead>Source</TableHead>
                     <TableHead>Status</TableHead>
@@ -189,8 +189,8 @@ export default function Dashboard() {
                     return (
                         <TableRow key={l.lead_id} className="hover:bg-indigo-50 transition">
                           <TableCell>{l.lead_id}</TableCell>
-                          <TableCell>{l.lead_name}</TableCell>
-                          <TableCell>{l.phone_number}</TableCell>
+                          <TableCell>{l.lead_name} , {l.phone_number}</TableCell>
+                          <TableCell>{l.form_completion_time_sec} Seconds.</TableCell>
                           <TableCell>{l.state} | {l.pincode} </TableCell>
                           <TableCell className="text-xs text-gray-500">
                             {l.source}
