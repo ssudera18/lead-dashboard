@@ -171,6 +171,8 @@ export default function Dashboard() {
                   <TableRow>
                     <TableHead>ID</TableHead>
                     <TableHead>Name</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>State | Postal Code</TableHead>
                     <TableHead>Source</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Decision</TableHead>
@@ -188,6 +190,8 @@ export default function Dashboard() {
                         <TableRow key={l.lead_id} className="hover:bg-indigo-50 transition">
                           <TableCell>{l.lead_id}</TableCell>
                           <TableCell>{l.lead_name}</TableCell>
+                          <TableCell>{l.phone_number}</TableCell>
+                          <TableCell>{l.state} | {l.pincode} </TableCell>
                           <TableCell className="text-xs text-gray-500">
                             {l.source}
                           </TableCell>
@@ -246,6 +250,7 @@ export default function Dashboard() {
             {detailsLead && (
                 <div className="grid gap-3 text-sm">
                   <div><b>Name:</b> {detailsLead.lead_name}</div>
+                  <div><b>Phone:</b> {detailsLead.phone_number}</div>
                   <div><b>State:</b> {detailsLead.state}</div>
                   <div><b>Pincode:</b> {detailsLead.pincode}</div>
                   <div><b>Status:</b> {detailsLead.carrier_acceptance_status}</div>
