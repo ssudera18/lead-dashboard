@@ -37,6 +37,7 @@ import StatusPie from "../components/charts/StatusPie";
 import SourceBar from "../components/charts/SourceBar";
 import LeadScatter from "../components/charts/LeadScatter";
 import LeadTrend from "../components/charts/LeadTrend";
+import StateBubble from "../components/charts/StateBubble";
 
 type Lead = {
   lead_id: string;
@@ -443,16 +444,16 @@ export default function Dashboard() {
 
               <CardHeader className="pb-2">
                 <CardTitle className="text-white text-lg">
-                  Lead Trend Analysis
+                  State-wise Lead Intelligence
                 </CardTitle>
 
                 <p className="text-sm text-slate-400">
-                  Accepted vs rejected trends over time
+                  Lead volume and conversion quality by region
                 </p>
               </CardHeader>
 
-              <CardContent className="h-[320px]">
-                <LeadTrend data={leads} />
+              <CardContent className="h-[360px]">
+                <StateBubble data={leads} />
               </CardContent>
 
             </Card>
