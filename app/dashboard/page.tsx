@@ -36,6 +36,7 @@ import { ChevronDown } from "lucide-react";
 import StatusPie from "../components/charts/StatusPie";
 import SourceBar from "../components/charts/SourceBar";
 import LeadScatter from "../components/charts/LeadScatter";
+import LeadTrend from "../components/charts/LeadTrend";
 
 type Lead = {
   lead_id: string;
@@ -442,16 +443,16 @@ export default function Dashboard() {
 
               <CardHeader className="pb-2">
                 <CardTitle className="text-white text-lg">
-                  Lead Correlation
+                  Lead Trend Analysis
                 </CardTitle>
 
                 <p className="text-sm text-slate-400">
-                  Form time vs acceptance quality
+                  Accepted vs rejected trends over time
                 </p>
               </CardHeader>
 
-              <CardContent className="h-[300px]">
-                <LeadScatter data={leads} />
+              <CardContent className="h-[320px]">
+                <LeadTrend data={leads} />
               </CardContent>
 
             </Card>
