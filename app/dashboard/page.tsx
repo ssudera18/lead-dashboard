@@ -67,8 +67,6 @@ export default function Dashboard() {
   >({});
   const [detailsLead, setDetailsLead] = React.useState<Lead | null>(null);
 
-  const [startDate, setStartDate] = React.useState("");
-  const [endDate, setEndDate] = React.useState("");
 
   React.useEffect(() => {
     async function load() {
@@ -98,26 +96,6 @@ export default function Dashboard() {
   const filtered = leads.filter((l) =>
     JSON.stringify(l).toLowerCase().includes(query.toLowerCase())
   );
-
-  const trendFilteredLeads = leads.filter((l) => {
-    if (!startDate && !endDate) return true;
-
-    const parts = l.timestamp?.split(" ")[0]?.split("/");
-
-    if (!parts || parts.length !== 3) return true;
-
-    const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-
-    const leadDate = new Date(formattedDate);
-
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
-
-    if (start && leadDate < start) return false;
-    if (end && leadDate > end) return false;
-
-    return true;
-  });
 
   const totals = {
     total: leads.length,
@@ -461,7 +439,27 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            
+            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+
+              <CardHeader className="pb-2 space-y-4">
+
+                <div>
+                  <CardTitle className="text-white text-lg">
+                    Lead Trend Analysis
+                  </CardTitle>
+
+                  <p className="text-sm text-slate-400">
+                    Accepted vs rejected trends over time
+                  </p>
+                </div>
+
+              </CardHeader>
+
+              <CardContent className="h-[320px]">
+                <LeadTrend data={filtered} />
+              </CardContent>
+
+            </Card>
 
           </div>
         </div>
