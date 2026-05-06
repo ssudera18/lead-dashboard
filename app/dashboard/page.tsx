@@ -353,55 +353,6 @@ export default function Dashboard() {
             {/* RIGHT */}
             <div className="space-y-6">
 
-              <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-
-                <CardHeader>
-                  <CardTitle className="text-white">
-                    System Health
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
-
-                  {[
-                    {
-                      label: "API Status",
-                      value: "Operational",
-                      color: "bg-emerald-400",
-                    },
-                    {
-                      label: "Fraud Detection",
-                      value: "Active",
-                      color: "bg-indigo-400",
-                    },
-                    {
-                      label: "Sync Status",
-                      value: "Live",
-                      color: "bg-cyan-400",
-                    },
-                  ].map((item, i) => (
-                      <div
-                          key={i}
-                          className="flex items-center justify-between rounded-2xl bg-white/5 p-4"
-                      >
-                        <div>
-                          <div className="text-sm text-slate-400">
-                            {item.label}
-                          </div>
-
-                          <div className="font-semibold text-white">
-                            {item.value}
-                          </div>
-                        </div>
-
-                        <div
-                            className={`h-3 w-3 rounded-full ${item.color} animate-pulse`}
-                        />
-                      </div>
-                  ))}
-
-                </CardContent>
-              </Card>
               {/* CHARTS */}
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
@@ -441,6 +392,7 @@ export default function Dashboard() {
                 </Card>
 
               </div>
+
 
               <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
 
