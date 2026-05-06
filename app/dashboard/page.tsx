@@ -57,24 +57,6 @@ function decisionFromAcceptance(status: string): ActionDecision {
   return "LIVE";
 }
 
-function decisionBadgeVariant(decision: ActionDecision) {
-  switch (decision) {
-    case "SCALE":
-      return "bg-emerald-500 text-white shadow-md";
-    case "CUT":
-      return "bg-red-500 text-white shadow-md";
-    default:
-      return "bg-yellow-400 text-black shadow-md";
-  }
-}
-
-function statusBadgeVariant(status: string) {
-  const s = (status || "").toLowerCase();
-  if (s === "accepted") return "bg-green-100 text-green-700";
-  if (s === "rejected") return "bg-red-100 text-red-700";
-  return "bg-gray-100 text-gray-700";
-}
-
 export default function Dashboard() {
   const [leads, setLeads] = React.useState<Lead[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -89,10 +71,13 @@ export default function Dashboard() {
       const res = await fetch(
           "https://lead-backend-l34r.onrender.com/api/dashboard"
       );
+
       const data = await res.json();
+
       setLeads(data);
 
-      const initial: any = {};
+      const initial: Record<string, ActionDecision> = {};
+
       data.forEach((l: Lead) => {
         initial[l.lead_id] = decisionFromAcceptance(
             l.carrier_acceptance_status
@@ -130,7 +115,7 @@ export default function Dashboard() {
   return (
       <div className="relative min-h-screen overflow-hidden bg-[#0B1120] text-white">
 
-        {/* Background Glow Effects */}
+        {/* BACKGROUND GLOWS */}
         <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-3xl" />
         <div className="absolute bottom-0 right-0 h-[500px] w-[500px] rounded-full bg-emerald-500/20 blur-3xl" />
 
@@ -142,23 +127,24 @@ export default function Dashboard() {
               <h1 className="text-4xl font-bold tracking-tight">
                 Lead Intelligence Dashboard
               </h1>
+
               <p className="text-slate-400 mt-1">
                 Analyze lead quality, conversions and source performance
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-xl">
-                <div className="text-xs text-slate-400">Environment</div>
-                <div className="font-semibold text-emerald-300">
-                  Production
-                </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-xl">
+              <div className="text-xs text-slate-400">Environment</div>
+
+              <div className="font-semibold text-emerald-300">
+                Production
               </div>
             </div>
           </div>
 
-          {/* KPI SECTION */}
+          {/* KPI */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+
             {[
               {
                 label: "Total Leads",
@@ -187,7 +173,7 @@ export default function Dashboard() {
             ].map((kpi, i) => (
                 <Card
                     key={i}
-                    className={`group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-indigo-500/10`}
+                    className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-indigo-500/10"
                 >
                   <div
                       className={`absolute inset-0 bg-gradient-to-br ${kpi.glow} to-transparent opacity-40`}
@@ -210,6 +196,256 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
             ))}
+          </div>
+
+          {/* ADVANCED ANALYTICS */}
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+
+            {/* LEFT */}
+            <div className="xl:col-span-2 space-y-6">
+
+              {/* Analytics Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-sm text-slate-400">
+                      Avg Form Completion
+                    </CardTitle>
+                  </CardHeader>
+
+                  <CardContent>
+                    <div className="text-4xl font-bold text-cyan-300">
+                      {Math.round(
+                          leads.reduce(
+                              (acc, l) =>
+                                  acc + Number(l.form_completion_time_sec || 0),
+                              0
+                          ) / (leads.length || 1)
+                      )}s
+                    </div>
+
+                    <div className="mt-2 text-xs text-slate-500">
+                      Avg user submission duration
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-sm text-slate-400">
+                      Suspicious Leads
+                    </CardTitle>
+                  </CardHeader>
+
+                  <CardContent>
+                    <div className="text-4xl font-bold text-red-300">
+                      {
+                        leads.filter(
+                            (l) =>
+                                Number(l.form_completion_time_sec) > 0 &&
+                                Number(l.form_completion_time_sec) < 5
+                        ).length
+                      }
+                    </div>
+
+                    <div className="mt-2 text-xs text-slate-500">
+                      Submitted under 5 seconds
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-sm text-slate-400">
+                      Top State
+                    </CardTitle>
+                  </CardHeader>
+
+                  <CardContent>
+                    <div className="text-3xl font-bold text-purple-300">
+                      {
+                        Object.entries(
+                            leads.reduce((acc: any, l) => {
+                              acc[l.state] = (acc[l.state] || 0) + 1;
+                              return acc;
+                            }, {})
+                        ).sort((a: any, b: any) => b[1] - a[1])[0]?.[0]
+                      }
+                    </div>
+
+                    <div className="mt-2 text-xs text-slate-500">
+                      Highest lead contribution
+                    </div>
+                  </CardContent>
+                </Card>
+
+              </div>
+
+              {/* AI INSIGHTS */}
+              <Card className="rounded-3xl border border-indigo-500/10 bg-indigo-500/5 backdrop-blur-2xl shadow-2xl">
+
+                <CardHeader>
+                  <CardTitle className="text-white">
+                    AI Insights
+                  </CardTitle>
+
+                  <p className="text-sm text-slate-400">
+                    Auto-generated intelligence from lead behavior
+                  </p>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+
+                  <div className="rounded-2xl border border-emerald-400/10 bg-emerald-500/10 p-4">
+                    <div className="font-semibold text-emerald-300">
+                      🚀 Best Lead Source
+                    </div>
+
+                    <div className="mt-1 text-sm text-slate-300">
+                      {
+                        Object.entries(
+                            leads.reduce((acc: any, l) => {
+                              acc[l.source] = (acc[l.source] || 0) + 1;
+                              return acc;
+                            }, {})
+                        ).sort((a: any, b: any) => b[1] - a[1])[0]?.[0]
+                      }{" "}
+                      is generating the highest lead volume.
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-indigo-400/10 bg-indigo-500/10 p-4">
+                    <div className="font-semibold text-indigo-300">
+                      📈 Conversion Trend
+                    </div>
+
+                    <div className="mt-1 text-sm text-slate-300">
+                      Acceptance rate currently stands at{" "}
+                      <span className="font-semibold text-white">
+                      {acceptanceRate}%
+                    </span>.
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-red-400/10 bg-red-500/10 p-4">
+                    <div className="font-semibold text-red-300">
+                      ⚠ Fraud Alert
+                    </div>
+
+                    <div className="mt-1 text-sm text-slate-300">
+                      {
+                        leads.filter(
+                            (l) =>
+                                Number(l.form_completion_time_sec) > 0 &&
+                                Number(l.form_completion_time_sec) < 5
+                        ).length
+                      }{" "}
+                      suspicious leads detected with ultra-fast submissions.
+                    </div>
+                  </div>
+
+                </CardContent>
+              </Card>
+
+            </div>
+
+            {/* RIGHT */}
+            <div className="space-y-6">
+
+              <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+
+                <CardHeader>
+                  <CardTitle className="text-white">
+                    System Health
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+
+                  {[
+                    {
+                      label: "API Status",
+                      value: "Operational",
+                      color: "bg-emerald-400",
+                    },
+                    {
+                      label: "Fraud Detection",
+                      value: "Active",
+                      color: "bg-indigo-400",
+                    },
+                    {
+                      label: "Sync Status",
+                      value: "Live",
+                      color: "bg-cyan-400",
+                    },
+                  ].map((item, i) => (
+                      <div
+                          key={i}
+                          className="flex items-center justify-between rounded-2xl bg-white/5 p-4"
+                      >
+                        <div>
+                          <div className="text-sm text-slate-400">
+                            {item.label}
+                          </div>
+
+                          <div className="font-semibold text-white">
+                            {item.value}
+                          </div>
+                        </div>
+
+                        <div
+                            className={`h-3 w-3 rounded-full ${item.color} animate-pulse`}
+                        />
+                      </div>
+                  ))}
+
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+
+                <CardHeader>
+                  <CardTitle className="text-white">
+                    Acceptance Ratio
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent>
+
+                  <div className="h-4 rounded-full bg-white/10 overflow-hidden">
+                    <div
+                        className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400"
+                        style={{ width: `${acceptanceRate}%` }}
+                    />
+                  </div>
+
+                  <div className="mt-4 flex justify-between text-sm">
+                    <div>
+                      <div className="text-slate-400">
+                        Accepted
+                      </div>
+
+                      <div className="text-emerald-300 font-semibold">
+                        {totals.accepted}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-slate-400">
+                        Rejected
+                      </div>
+
+                      <div className="text-red-300 font-semibold">
+                        {totals.rejected}
+                      </div>
+                    </div>
+                  </div>
+
+                </CardContent>
+              </Card>
+
+            </div>
           </div>
 
           {/* CHARTS */}
@@ -249,6 +485,7 @@ export default function Dashboard() {
                 <SourceBar data={leads} />
               </CardContent>
             </Card>
+
           </div>
 
           {/* TABLE */}
@@ -275,10 +512,12 @@ export default function Dashboard() {
             </CardHeader>
 
             <CardContent className="p-0">
+
               <div className="max-h-[650px] overflow-auto">
 
                 <Table>
                   <TableHeader className="sticky top-0 bg-white/5 backdrop-blur-xl">
+
                     <TableRow className="border-white/10 hover:bg-transparent">
                       <TableHead className="text-slate-300">ID</TableHead>
                       <TableHead className="text-slate-300">Name & Phone</TableHead>
@@ -291,9 +530,11 @@ export default function Dashboard() {
                         Action
                       </TableHead>
                     </TableRow>
+
                   </TableHeader>
 
                   <TableBody>
+
                     {filtered.map((l) => {
                       const decision =
                           decisionByLeadId[l.lead_id] ??
@@ -304,19 +545,20 @@ export default function Dashboard() {
                               key={l.lead_id}
                               className="border-white/5 hover:bg-white/5 transition-all duration-200"
                           >
+
                             <TableCell className="font-medium text-white">
                               {l.lead_id}
                             </TableCell>
 
                             <TableCell>
                               <div className="flex flex-col">
-                          <span className="font-medium text-white">
-                            {l.lead_name}
-                          </span>
+                    <span className="font-medium text-white">
+                      {l.lead_name}
+                    </span>
 
                                 <span className="text-xs text-slate-400">
-                            {l.phone_number}
-                          </span>
+                      {l.phone_number}
+                    </span>
                               </div>
                             </TableCell>
 
@@ -359,7 +601,9 @@ export default function Dashboard() {
                             </TableCell>
 
                             <TableCell className="text-right">
+
                               <DropdownMenu>
+
                                 <DropdownMenuTrigger asChild>
                                   <Button
                                       size="sm"
@@ -374,20 +618,27 @@ export default function Dashboard() {
                                     align="end"
                                     className="border-white/10 bg-[#111827]/95 text-white backdrop-blur-2xl"
                                 >
+
                                   <DropdownMenuItem
-                                      onClick={() => setDecision(l.lead_id, "SCALE")}
+                                      onClick={() =>
+                                          setDecision(l.lead_id, "SCALE")
+                                      }
                                   >
                                     SCALE
                                   </DropdownMenuItem>
 
                                   <DropdownMenuItem
-                                      onClick={() => setDecision(l.lead_id, "LIVE")}
+                                      onClick={() =>
+                                          setDecision(l.lead_id, "LIVE")
+                                      }
                                   >
                                     LIVE
                                   </DropdownMenuItem>
 
                                   <DropdownMenuItem
-                                      onClick={() => setDecision(l.lead_id, "CUT")}
+                                      onClick={() =>
+                                          setDecision(l.lead_id, "CUT")
+                                      }
                                   >
                                     CUT
                                   </DropdownMenuItem>
@@ -395,16 +646,22 @@ export default function Dashboard() {
                                   <DropdownMenuItem
                                       onClick={() => setDetailsLead(l)}
                                   >
-                                    View
+                                    View Details
                                   </DropdownMenuItem>
+
                                 </DropdownMenuContent>
+
                               </DropdownMenu>
+
                             </TableCell>
+
                           </TableRow>
                       );
                     })}
+
                   </TableBody>
                 </Table>
+
               </div>
             </CardContent>
           </Card>
@@ -427,6 +684,7 @@ export default function Dashboard() {
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                       <div className="text-slate-400">Name</div>
+
                       <div className="font-semibold text-white">
                         {detailsLead.lead_name}
                       </div>
@@ -434,6 +692,7 @@ export default function Dashboard() {
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                       <div className="text-slate-400">Phone</div>
+
                       <div className="font-semibold text-white">
                         {detailsLead.phone_number}
                       </div>
@@ -441,6 +700,7 @@ export default function Dashboard() {
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                       <div className="text-slate-400">Location</div>
+
                       <div className="font-semibold text-white">
                         {detailsLead.state} | {detailsLead.pincode}
                       </div>
@@ -457,6 +717,7 @@ export default function Dashboard() {
                   Close
                 </Button>
               </DialogFooter>
+
             </DialogContent>
           </Dialog>
         </div>
