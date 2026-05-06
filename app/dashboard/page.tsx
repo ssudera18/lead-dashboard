@@ -32,12 +32,19 @@ import {
 } from "@/components/ui/dialog";
 
 import { ChevronDown } from "lucide-react";
+import dynamic from "next/dynamic";
+
 
 import StatusPie from "../components/charts/StatusPie";
 import SourceBar from "../components/charts/SourceBar";
 import LeadScatter from "../components/charts/LeadScatter";
 import LeadTrend from "../components/charts/LeadTrend";
-import StateBubble from "../components/charts/StateBubble";
+const StateBubble = dynamic(
+  () => import("../components/charts/StateBubble"),
+  {
+    ssr: false,
+  }
+);
 
 type Lead = {
   lead_id: string;

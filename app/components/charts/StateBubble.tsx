@@ -2,10 +2,10 @@
 
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import HighchartsMore from "highcharts/highcharts-more";
+import HC_more from "highcharts/highcharts-more";
 
-if (typeof HighchartsMore === "function") {
-  (HighchartsMore as any)(Highcharts);
+if (typeof Highcharts === "object") {
+  HC_more(Highcharts);
 }
 
 export default function StateBubble({ data }: any) {
