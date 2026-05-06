@@ -461,56 +461,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-
-              <CardHeader className="pb-2 space-y-4">
-
-                <div>
-                  <CardTitle className="text-white text-lg">
-                    Lead Trend Analysis
-                  </CardTitle>
-
-                  <p className="text-sm text-slate-400">
-                    Accepted vs rejected trends over time
-                  </p>
-                </div>
-
-                {/* FILTERS */}
-                <div className="flex flex-col md:flex-row gap-3">
-
-                  <Input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full md:w-[180px] rounded-xl border border-white/10 bg-white/5 text-white backdrop-blur-xl"
-                  />
-
-                  <Input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full md:w-[180px] rounded-xl border border-white/10 bg-white/5 text-white backdrop-blur-xl"
-                  />
-
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setStartDate("");
-                      setEndDate("");
-                    }}
-                    className="border-white/10 bg-white/5 hover:bg-white/10 text-white"
-                  >
-                    Reset
-                  </Button>
-
-                </div>
-              </CardHeader>
-
-              <CardContent className="h-[320px]">
-                <LeadTrend data={trendFilteredLeads} />
-              </CardContent>
-
-            </Card>
+            
 
           </div>
         </div>
