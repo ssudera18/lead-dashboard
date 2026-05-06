@@ -426,7 +426,9 @@ export default function Dashboard() {
 
           </div>
           {/* CHARTS */}
-          <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
+          
+        </div>
+<div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
 
             <Card className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
 
@@ -468,8 +470,6 @@ export default function Dashboard() {
             </Card>
 
           </div>
-        </div>
-
 
 
 
