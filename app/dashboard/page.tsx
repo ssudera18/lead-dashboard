@@ -283,7 +283,7 @@ export default function Dashboard() {
               </Card>
 
             </div>
-            
+
             {/* TRENDS */}
             <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
 
@@ -426,44 +426,48 @@ export default function Dashboard() {
 
           </div>
           {/* CHARTS */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
 
-              <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-white">
-                    Lead Status Distribution
-                  </CardTitle>
+            <Card className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
 
-                  <p className="text-sm text-slate-400">
-                    Accepted vs rejected breakdown
-                  </p>
-                </CardHeader>
+              <CardHeader>
+                <CardTitle className="text-white">
+                  Lead Status Distribution
+                </CardTitle>
 
-                <CardContent>
-                  <StatusPie
-                    accepted={totals.accepted}
-                    rejected={totals.rejected}
-                  />
-                </CardContent>
-              </Card>
+                <p className="text-sm text-slate-400">
+                  Accepted vs rejected breakdown
+                </p>
+              </CardHeader>
 
-              <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-white">
-                    Lead Sources
-                  </CardTitle>
+              <CardContent className="h-[320px] w-full">
+                <StatusPie
+                  accepted={totals.accepted}
+                  rejected={totals.rejected}
+                />
+              </CardContent>
 
-                  <p className="text-sm text-slate-400">
-                    Source-wise lead generation
-                  </p>
-                </CardHeader>
+            </Card>
 
-                <CardContent>
-                  <SourceBar data={leads} />
-                </CardContent>
-              </Card>
+            <Card className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
 
-            </div>
+              <CardHeader>
+                <CardTitle className="text-white">
+                  Lead Sources
+                </CardTitle>
+
+                <p className="text-sm text-slate-400">
+                  Source-wise lead generation
+                </p>
+              </CardHeader>
+
+              <CardContent className="h-[320px] w-full">
+                <SourceBar data={leads} />
+              </CardContent>
+
+            </Card>
+
+          </div>
         </div>
 
 
