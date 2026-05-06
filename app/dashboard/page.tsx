@@ -37,14 +37,6 @@ import dynamic from "next/dynamic";
 
 import StatusPie from "../components/charts/StatusPie";
 import SourceBar from "../components/charts/SourceBar";
-import LeadScatter from "../components/charts/LeadScatter";
-import LeadTrend from "../components/charts/LeadTrend";
-const StateBubble = dynamic(
-  () => import("../components/charts/StateBubble"),
-  {
-    ssr: false,
-  }
-);
 
 type Lead = {
   lead_id: string;
@@ -446,25 +438,6 @@ export default function Dashboard() {
 
               </CardContent>
             </Card>
-
-            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-
-              <CardHeader className="pb-2">
-                <CardTitle className="text-white text-lg">
-                  State-wise Lead Intelligence
-                </CardTitle>
-
-                <p className="text-sm text-slate-400">
-                  Lead volume and conversion quality by region
-                </p>
-              </CardHeader>
-
-              <CardContent className="h-[360px]">
-                <StateBubble data={leads} />
-              </CardContent>
-
-            </Card>
-
           </div>
         </div>
 
