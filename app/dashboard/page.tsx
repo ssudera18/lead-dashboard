@@ -322,6 +322,79 @@ export default function Dashboard() {
               </Card>
 
             </div>
+            {/* TRENDS */}
+            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+
+              <CardHeader className="pb-2 space-y-4">
+
+                <div>
+                  <CardTitle className="text-white text-lg">
+                    Lead Trend Analysis
+                  </CardTitle>
+
+                  <p className="text-sm text-slate-400">
+                    Accepted vs rejected trends over time
+                  </p>
+                </div>
+
+              </CardHeader>
+
+              <CardContent className="h-[320px]">
+                <LeadTrend data={filtered} />
+              </CardContent>
+
+            </Card>
+
+
+          </div>
+
+          {/* RIGHT */}
+          <div className="space-y-6">
+
+
+
+
+            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+
+              <CardHeader>
+                <CardTitle className="text-white">
+                  Acceptance Ratio
+                </CardTitle>
+              </CardHeader>
+
+              <CardContent>
+
+                <div className="h-4 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400"
+                    style={{ width: `${acceptanceRate}%` }}
+                  />
+                </div>
+
+                <div className="mt-4 flex justify-between text-sm">
+                  <div>
+                    <div className="text-slate-400">
+                      Accepted
+                    </div>
+
+                    <div className="text-emerald-300 font-semibold">
+                      {totals.accepted}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-slate-400">
+                      Rejected
+                    </div>
+
+                    <div className="text-red-300 font-semibold">
+                      {totals.rejected}
+                    </div>
+                  </div>
+                </div>
+
+              </CardContent>
+            </Card>
 
             {/* AI INSIGHTS */}
             <Card className="rounded-3xl border border-indigo-500/10 bg-indigo-500/5 backdrop-blur-2xl shadow-2xl">
@@ -387,78 +460,6 @@ export default function Dashboard() {
                 </div>
 
               </CardContent>
-            </Card>
-
-          </div>
-
-          {/* RIGHT */}
-          <div className="space-y-6">
-
-
-
-
-            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-
-              <CardHeader>
-                <CardTitle className="text-white">
-                  Acceptance Ratio
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent>
-
-                <div className="h-4 rounded-full bg-white/10 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400"
-                    style={{ width: `${acceptanceRate}%` }}
-                  />
-                </div>
-
-                <div className="mt-4 flex justify-between text-sm">
-                  <div>
-                    <div className="text-slate-400">
-                      Accepted
-                    </div>
-
-                    <div className="text-emerald-300 font-semibold">
-                      {totals.accepted}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-slate-400">
-                      Rejected
-                    </div>
-
-                    <div className="text-red-300 font-semibold">
-                      {totals.rejected}
-                    </div>
-                  </div>
-                </div>
-
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-
-              <CardHeader className="pb-2 space-y-4">
-
-                <div>
-                  <CardTitle className="text-white text-lg">
-                    Lead Trend Analysis
-                  </CardTitle>
-
-                  <p className="text-sm text-slate-400">
-                    Accepted vs rejected trends over time
-                  </p>
-                </div>
-
-              </CardHeader>
-
-              <CardContent className="h-[320px]">
-                <LeadTrend data={filtered} />
-              </CardContent>
-
             </Card>
 
           </div>
