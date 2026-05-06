@@ -402,6 +402,45 @@ export default function Dashboard() {
 
                 </CardContent>
               </Card>
+              {/* CHARTS */}
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+                <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-white">
+                      Lead Status Distribution
+                    </CardTitle>
+
+                    <p className="text-sm text-slate-400">
+                      Accepted vs rejected breakdown
+                    </p>
+                  </CardHeader>
+
+                  <CardContent>
+                    <StatusPie
+                        accepted={totals.accepted}
+                        rejected={totals.rejected}
+                    />
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-white">
+                      Lead Sources
+                    </CardTitle>
+
+                    <p className="text-sm text-slate-400">
+                      Source-wise lead generation
+                    </p>
+                  </CardHeader>
+
+                  <CardContent>
+                    <SourceBar data={leads} />
+                  </CardContent>
+                </Card>
+
+              </div>
 
               <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
 
@@ -448,45 +487,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* CHARTS */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
-            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-              <CardHeader>
-                <CardTitle className="text-white">
-                  Lead Status Distribution
-                </CardTitle>
-
-                <p className="text-sm text-slate-400">
-                  Accepted vs rejected breakdown
-                </p>
-              </CardHeader>
-
-              <CardContent>
-                <StatusPie
-                    accepted={totals.accepted}
-                    rejected={totals.rejected}
-                />
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
-              <CardHeader>
-                <CardTitle className="text-white">
-                  Lead Sources
-                </CardTitle>
-
-                <p className="text-sm text-slate-400">
-                  Source-wise lead generation
-                </p>
-              </CardHeader>
-
-              <CardContent>
-                <SourceBar data={leads} />
-              </CardContent>
-            </Card>
-
-          </div>
 
           {/* TABLE */}
           <Card className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl overflow-hidden">
