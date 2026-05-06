@@ -52,7 +52,7 @@ export default function Sidebar() {
         {!collapsed && (
           <div>
             <h1 className="text-2xl font-bold text-white">
-              LeadIntel
+              Intelli Lead System
             </h1>
 
             <p className="text-sm text-slate-400">
