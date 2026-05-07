@@ -442,7 +442,7 @@ export default function Dashboard() {
                 </p>
               </CardHeader>
 
-              <CardContent className="h-[320px] w-full">
+              <CardContent className="h-[450px] w-full">
                 <StatusPie
                   accepted={totals.accepted}
                   rejected={totals.rejected}
@@ -463,7 +463,7 @@ export default function Dashboard() {
                 </p>
               </CardHeader>
 
-              <CardContent className="h-[320px] w-full">
+              <CardContent className="h-[450px] w-full">
                 <SourceBar data={leads} />
               </CardContent>
 
